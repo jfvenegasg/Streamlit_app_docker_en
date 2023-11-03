@@ -1,9 +1,7 @@
 # Streamlit_app_docker
-Este es un ejemplo básico para ejecutar Streamlit-apps en contenedores
-Docker.Para ejecutar el contenedor que se muestra en este tutorial se
-asume que Docker ya esta instalado.
 
-Sin embargo a continuación te dejo el enlace para la descarga de [Docker](https://www.docker.com/)
+Este es un tutorial para ejecutar Streamlit-apps en el servicio Cloud Run de **Google Cloud Platform(GCP)**.Para desplegar una Streamlit-app se utilizaran imagenes docker,la cual primero se testea de forma local y luego se migra al entorno cloud.En este tutorial se asume que ya tienes instalada Docker,sin embargo a continuación te dejo el enlace para la descarga de [Docker](https://www.docker.com/)
+
 
 ## Estructura
 
@@ -17,9 +15,16 @@ El archivo Dockerfile sera con el que construiremos la imagen para luego despleg
   - 📄 Dockerfile
   - 📄 app_cloud_gcp_py.py
   - 📄 requirements.txt
-  - 🖼️ docker_1.png
   - 💹 trip_austin.csv        
   - 📄 .gitignore
+  - 🖼️ artifact_registry.png
+  - 🖼️ cloud_run_1.png
+  - 🖼️ cloud_run_2.png
+  - 🖼️ cloud_run_3.png
+  - 🖼️ create_repo.png
+  - 🖼️ docker_1.png
+  - 🖼️ image_app.png
+  - 🖼️ image_repo_docker.png
       
 ```
 
@@ -75,7 +80,7 @@ Si todos los pasos anteriores se desarrollaron de forma correcta,el contenedor s
 [127.0.0.1:8080](http://127.0.0.1:8080)
 
 
-![app-shiny](image_app.png)
+![Stream-shiny](image_app.png)
 
 ## Migrar imagen Docker
 
@@ -83,11 +88,11 @@ Para migrar la imagen ya construida,primero debemos habilitar el servicio Artifa
 
 ![artifact_rgistry_gcp](artifact_registry.png)
 
-Luego en este servicio debemos crear un repositorio,el cual puede ser creado desde la consola de GCP o desde el menu **Create Repository**.En este caso utilizare uno que ya tengo creado.
+Luego en este servicio debemos crear un repositorio,el cual puede ser creado desde la consola de GCP o desde el menu **Create Repository**.
 
 ![crear repositorio](create_repo.png)
 
-Cuando creamos el repositorio elegimos el format como Docker,el mode como standar y la region en este caso la fijare en southamerica-west1[Santiago].
+Cuando creamos el repositorio elegimos el format como Docker,el mode como standard y la region en este caso la fijare en **southamerica-west1[Santiago]**.
 
 Una vez creado el repositorio configuramos de forma local nuestro docker para poder hacer push o pull a las imagenes.
 
@@ -101,7 +106,7 @@ Luego tenemos que etiquetar a nuestra stream_app con la ruta del directorio del 
 docker tag stream_app:latest southamerica-west1-docker.pkg.dev/driven-saga-403916/docker-repo/stream_app:latest
 ```
 
-Una vez etiquetada la imagen,le podemos dar a push a la imagen con la siguiente linea
+Una vez etiquetada la imagen,le podemos dar a push a la imagen de nuestra app.
 
 ``` dockerfile
 docker push southamerica-west1-docker.pkg.dev/driven-saga-403916/docker-repo/stream_app:latest
@@ -111,11 +116,11 @@ Si la imagen fue cargada correctamente la podremos ver en el repositorio de Arti
 
 ![imagen en el repo docker](image_repo_docker.png)
 
-Como podemos ver en la imagen,ya tenemos la imagen de nuestra app shiny.De esta forma ahora la podemos desplegar con el servicio Cloud Run.
+Como se ve en la imagen,hay 2 imagenes.La imagen stream_app es la que acabamos de subir,en cambio la que dice shiny_app,es la imagen de una app que subi anteriormente.
 
 ## Desplegar con Cloud Run
 
-Una vez accedemos al servicio Cloud Run,tenemos que crear un servicio en donde se abrira el siguiente menu.
+Una vez accedemos al servicio Cloud Run,tenemos que crear un **servicio**, en donde se abrira el siguiente menu.
 
 ![Configuracion cloud run](cloud_run_1.png)
 
@@ -133,10 +138,10 @@ Si la imagen se despliega de forma correcta,la deberiamos poder ver como se ve e
 
 Finalmente si queremos acceder al servicio,podemos entrar al URL que se nos muestra en la imagen.
 
-Se los dejo a continuación.
+Se las dejo a continuación.
 
-<https://shiny-app-vvrixyvk3q-uc.a.run.app>
+https://stream-app-vvrixyvk3q-uc.a.run.app/
 
-Aca se una vista de la shiny app.
+Aca se una vista de la stream app.
 
 ![Shiny app desplegada](cloud_run_3.png)
