@@ -1,13 +1,12 @@
-# Streamlit_app_docker
+# Streamlit_app_docker_en
 
-Este es un tutorial para ejecutar Streamlit-apps en el servicio Cloud Run de **Google Cloud Platform(GCP)**.Para desplegar una Streamlit-app se utilizaran imagenes docker,la cual primero se testea de forma local y luego se migra al entorno cloud.En este tutorial se asume que ya tienes instalada Docker,sin embargo a continuación te dejo el enlace para la descarga de [Docker](https://www.docker.com/)
+This is a tutorial to run Streamlit-apps in the Cloud Run service of **Google Cloud Platform (GCP)**. To deploy a Streamlit-app, docker images will be used, which are first tested locally and then migrated to the cloud environment. This tutorial assumes that you already have Docker installed, however below I leave you the link to download [Docker](https://www.docker.com/)
 
+## Structure
 
-## Estructura
+The following project considers as main files and elements, the **Dockerfile** file, the **requirements.txt** file and **app_cloud_gcp_py.py**
 
-El siguiente proyecto considera como archivos y elementos principales,el archivo **Dockerfile**,el archivo **requirements.txt** y **app_cloud_gcp_py.py**
-
-El archivo Dockerfile sera con el que construiremos la imagen para luego desplegar en un contenedor,en cambio los otros archivos son necesarios para la ejecución de la Streamlit-app.
+The Dockerfile file will be the one with which we will build the image and then deploy it in a container, however the other files are necessary for the execution of the Streamlit-app.
 
 ``` docker
 - 📁 Streamlit_app_docker
@@ -30,9 +29,9 @@ El archivo Dockerfile sera con el que construiremos la imagen para luego despleg
 
 ### Dockerfile
 
-El archivo docker puede ser modificado segun el tipo de aplicación que
-se utilice.En este caso si deseas seguir trabajando con Streamlit-apps,y
-agregar otras features,puedes agregar las bibliotecas que vayas a utilizar en el **requirements.txt**.
+The docker file can be modified depending on the type of application
+be used.In this case if you want to continue working with Streamlit-apps,and
+add other features, you can add the libraries that you are going to use in the **requirements.txt**.
 
 ``` docker
 # app/Dockerfile
@@ -60,7 +59,7 @@ ENTRYPOINT ["streamlit", "run", "app_cloud_gcp_py.py", "--server.port=8080", "--
 
 ## Build
 
-Para construir la imagen docker llamada **stream_app**,se usa la siguiente linea.
+To build the docker image called **stream_app**, the following line is used.
 
 ``` docker
 docker build -t stream_app .
@@ -68,80 +67,80 @@ docker build -t stream_app .
 
 ## Run
 
-Una vez lista la imagen **stream_app**,ejecutamos la siguiente linea para ejecutar nuestra imagen dentro de un contenedor que tendra expuesto el puerto 8080.
+Once the **stream_app** image is ready, we execute the following line to run our image inside a container that will have port 8080 exposed.
 
 ``` docker
 docker run -d -p 8080:8080 stream_app 
 ```
-## Acceso al contenedor
+## Access to container
 
-Si todos los pasos anteriores se desarrollaron de forma correcta,el contenedor se debe estar ejecutando en la siguiente dirección.
+If all the previous steps were carried out correctly, the container should be running at the following address.
 
 [127.0.0.1:8080](http://127.0.0.1:8080)
 
 
-![Stream-shiny](image_app.png)
+![Stream-app](image_app.png)
 
-## Migrar imagen Docker
+## Push Image
 
-Para migrar la imagen ya construida,primero debemos habilitar el servicio Artifact Registry en Google Cloud Platform.Si lo habilitamos de forma correcta deberiamos ver la siguiente pantalla.
+To migrate the already built image, we must first enable the Artifact Registry service on Google Cloud Platform. If we enable it correctly we should see the following screen.
 
 ![artifact_rgistry_gcp](artifact_registry.png)
 
-Luego en este servicio debemos crear un repositorio,el cual puede ser creado desde la consola de GCP o desde el menu **Create Repository**.
+Then in this service we can create a repository, which can be created from the GCP console or from the **Create Repository** menu.
 
-![crear repositorio](create_repo.png)
+![Create repo](create_repo.png)
 
-Cuando creamos el repositorio elegimos el format como Docker,el mode como standard y la region en este caso la fijare en **southamerica-west1[Santiago]**.
+When we create the repository we choose the format as Docker, the mode as standard and the region in this case I will set it to **southamerica-west1[Santiago]**.
 
-Una vez creado el repositorio configuramos de forma local nuestro docker para poder hacer push o pull a las imagenes.
+Once the repository is created, we configure our docker locally to be able to push or pull the images.
 
 ``` dockerfile
 gcloud auth configure-docker southamerica-west1-docker.pkg.dev
 ```
 
-Luego tenemos que etiquetar a nuestra stream_app con la ruta del directorio del repositorio de imagenes en la nube.
+Then we have to tag our stream_app with the directory path of the cloud image repository.
 
 ``` dockerfile
 docker tag stream_app:latest southamerica-west1-docker.pkg.dev/driven-saga-403916/docker-repo/stream_app:latest
 ```
 
-Una vez etiquetada la imagen,le podemos dar a push a la imagen de nuestra app.
+Once the image has been tagged, we can push the image of our app.
 
 ``` dockerfile
 docker push southamerica-west1-docker.pkg.dev/driven-saga-403916/docker-repo/stream_app:latest
 ```
 
-Si la imagen fue cargada correctamente la podremos ver en el repositorio de Artifact Registry como se ve en la imagen.
+If the image was uploaded correctly we can see it in the Artifact Registry repository as seen in the image.
 
-![imagen en el repo docker](image_repo_docker.png)
+![Image in the Docker Repo](image_repo_docker.png)
 
-Como se ve en la imagen,hay 2 imagenes.La imagen stream_app es la que acabamos de subir,en cambio la que dice shiny_app,es la imagen de una app que subi anteriormente.
+As seen in the image, there are 2 images. The stream_app image is the one we just uploaded, however the one that says shiny_app is the image of an app that I uploaded previously.
 
-## Desplegar con Cloud Run
+## Deploy in Cloud Run
 
-Una vez accedemos al servicio Cloud Run,tenemos que crear un **servicio**, en donde se abrira el siguiente menu.
+Once we access the Cloud Run service, we have to create a **service**, where the following menu will open.
 
-![Configuracion cloud run](cloud_run_1.png)
+![Cloud Run Configuration](cloud_run_1.png)
 
-Desde el menu de configuracion del servicio tenemos que seleccionar en la primera opcion **Container image URL**,la ruta en donde se encuentra nuestra imagen en el repositorio,luego asignamos el **Service Name** y la **Region**.
+From the service configuration menu we have to select in the first option **Container image URL**, the path where our image is located in the repository, then we assign the **Service Name** and the **Region** .
 
-Mas abajo seleccionamos el valor de 1 en la opcion **Minimum number of instances**,para que el primer despliegue no sea tan lento.
+Below we select the value of 1 in the **Minimum number of instances** option, so that the first deployment is not so slow.
 
-Ademas en el menu **Authentication**,seleccionamos la opcion ***Allow unauthenticated invocations***
+Also in the **Authentication** menu, we select the option ***Allow unauthenticated invocations***
 
-Finalmente en el último modulo de configuracion seleccionamos el valor de 8080 en la opcion **Container port**,que corresponde al puerto asignamos en el dockerfile.
+Finally, in the last configuration module we select the value of 8080 in the **Container port** option, which corresponds to the port we assigned in the dockerfile.
 
-Si la imagen se despliega de forma correcta,la deberiamos poder ver como se ve en la imagen.
+If the image is displayed correctly, we should be able to see it as it looks in the image.
 
-![servicio desplegado en cloud run](cloud_run_2.png)
+![Service deploy in cloud run](cloud_run_2.png)
 
-Finalmente si queremos acceder al servicio,podemos entrar al URL que se nos muestra en la imagen.
+Finally, if we want to access the service, we can enter the URL shown in the image.
 
-Se las dejo a continuación.
+I leave them below.
 
-https://stream-app-vvrixyvk3q-uc.a.run.app/
+<https://stream-app-en-vvrixyvk3q-uc.a.run.app/>
 
-Aca se una vista de la stream app.
+Here is a view of the stream app.
 
-![Shiny app desplegada](cloud_run_3.png)
+![Shiny app deploy](cloud_run_3.png)
